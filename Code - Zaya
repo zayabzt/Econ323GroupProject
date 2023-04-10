@@ -1,12 +1,15 @@
 # Importing necessary libraries
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-%matplotlib inline
-
 import sklearn
 import sklearn.model_selection
 import sklearn.ensemble
+
+# Installing visualization tools
+import matplotlib.pyplot as plt
+%matplotlib inline
+from wordcloud import WordCloud, STOPWORDS
+
 
 # Installing Beautiful Soup package
 !pip install transformers
@@ -14,11 +17,17 @@ from transformers import pipeline
 from bs4 import BeautifulSoup
 import requests
 
+
 # Downloading data
 df_type = pd.read_csv("MBTI_type.csv")
 df_posts = pd.read_csv("MBTI_posts.csv")
 
 # Cleaning the data
+df_posts.isna().sum()
+df_posts.dtypes
+df_type.isna().sum()
+df_type.dtypes
+
 # Separating the cell that contains 50 posts each into 50 columns for eash post
 sep_posts = df_posts['posts'].str.split("|\|\|", expand = True) 
 sample_posts = pd.DataFrame(sep_posts[0].str[1:])                       
@@ -45,6 +54,19 @@ types = [ESTJ, ENTJ, ESFJ, ENFJ, ISTJ, ISFJ, INTJ, INFJ, ESTP, ESFP, ENTP, ENFP,
 for type in types:
   counter = counter(type)  
   return counter.most_common(10)
+
+# Creating a wordcloud of frequenty used word for each personality type
+word_cloud = WordCloud(collocations = False, background_color = 'white').generate(posts)
+fig, ax = plt.subplots(16, figsize=(14, 16))
+x = 0
+for i in df['type'].unique():
+    df_each = df[df['type'] == i]
+    wordcloud = WordCloud(max_words=1000, collocations = False, background_color = 'white').generate(df_each['posts'].to_string())
+    plt.subplot(3, 5, x+1)
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.title(i)
+    ax[k].axis("off")
+    x+=1
 
 # Length of each post
 df_analysis = df.copy()

@@ -25,8 +25,12 @@ sample_posts = pd.DataFrame(sep_posts[0].str[1:])
 df = pd.concat([df_type, sample_posts], axis=1)
 
 # Checking if the data is imbalanced
-df_dist = df.select("type").groupBy("type").count().sort("type").toPandas()
-df_dist.plot.bar(x="type", y="count", figsize=(16, 4))
+df_dist = df["type"].value_counts()
+df_dist.plot(kind="bar")
+df_dist.set_xlabel("Personality Types")
+df_dist.set_ylabel("Number of Samples")
+plt.show()
+plt.tight_layout()
 
 # Creating a dataframe for each personality type
 by_type = df.groupby("type")
@@ -34,5 +38,23 @@ INTJ = by_type.get_group("INTJ")
 INTP = by_type.get_group("INTP")
 ESTJ = by_type.get_group("ESTJ")
 
-# Most commonly used words for each personality type
+# Most frequently used 10 words for each personality type
+from collections import counter
+types = [ESTJ, ENTJ, ESFJ, ENFJ, ISTJ, ISFJ, INTJ, INFJ, ESTP, ESFP, ENTP, ENFP, ISTP, ISFP, INTP, INFP]
 
+for type in types:
+  counter = counter(type)  
+  return counter.most_common(10)
+
+# Length of each post
+df_analysis = df.copy()
+df_analysis['Length of post'] = df['posts'].apply(lambda x: len(x))
+
+# Frequency of links used - counting the number of http
+df_analysis['Number of links'] = df['posts'].apply(lambda x: x.count('http'))
+
+# Frequency of punctuations used
+df_analysis['Number of question marks']=df['posts'].apply(lambda x: x.count('?'))
+df_analysis['Number of periods']=df['posts'].apply(lambda x: x.count('.'))
+df_analysis['Number of exclamation marks']=df['posts'].apply(lambda x: x.count('!'))
+df_analysis['Number of ellipsis']=df['posts'].apply(lambda x: x.count('...'))

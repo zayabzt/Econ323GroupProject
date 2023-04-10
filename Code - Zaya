@@ -1,0 +1,38 @@
+# Importing necessary libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+import sklearn
+import sklearn.model_selection
+import sklearn.ensemble
+
+# Installing Beautiful Soup package
+!pip install transformers
+from transformers import pipeline
+from bs4 import BeautifulSoup
+import requests
+
+# Downloading data
+df_type = pd.read_csv("MBTI_type.csv")
+df_posts = pd.read_csv("MBTI_posts.csv")
+
+# Cleaning the data
+# Separating the cell that contains 50 posts each into 50 columns for eash post
+sep_posts = df_posts['posts'].str.split("|\|\|", expand = True) 
+sample_posts = pd.DataFrame(sep_posts[0].str[1:])                       
+df = pd.concat([df_type, sample_posts], axis=1)
+
+# Checking if the data is imbalanced
+df_dist = df.select("type").groupBy("type").count().sort("type").toPandas()
+df_dist.plot.bar(x="type", y="count", figsize=(16, 4))
+
+# Creating a dataframe for each personality type
+by_type = df.groupby("type")
+INTJ = by_type.get_group("INTJ")
+INTP = by_type.get_group("INTP")
+ESTJ = by_type.get_group("ESTJ")
+
+# Most commonly used words for each personality type
+
